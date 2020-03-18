@@ -1,5 +1,10 @@
 <?php
 
+defined('ABSPATH') or die('No script kiddies please!');
+
+/*
+ * adds delivery time field
+ */
 add_filter('woocommerce_checkout_fields', function($fields) {
     $params = get_option('delivery-checkout');
     if (!$params || gettype($params) !== 'array') {
@@ -14,7 +19,6 @@ add_filter('woocommerce_checkout_fields', function($fields) {
             'type' => 'select',
             'label' => 'Gewünschte Lieferzeit',
             'required' => 1,
-            'default' => WC()->session->get('delivery_time', ''),
             'options' => generate_delivery_times($params),
         )
     );
@@ -25,6 +29,9 @@ add_filter('woocommerce_checkout_fields', function($fields) {
     return $fields;
 });
 
+/*
+ * generate all current delivery times
+ */
 function generate_delivery_times($params) {
     $step = 1;
     $now = new DateTime( 'now', wp_timezone() );
@@ -40,20 +47,8 @@ function generate_delivery_times($params) {
 }
 
 /*
- * Hinzufügen zur Thank You Page
+ * force postcode in checkout
  */
-add_filter('woocommerce_thankyou', function($order_id) {
-    $order = new WC_Order($order_id);
-    $delivery_time = intval($order->get_meta('billing_delivery_time', true));
-    ?>
-    <p>
-        <strong>Gewünschte Lieferzeit</strong><br>
-        <?php echo($delivery_time); ?> - <?php echo($delivery_time + 1); ?> Uhr
-    </p>
-    <?php
-}, 10, 2);
-
-
 add_action('template_redirect', function() {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET')
         return;
@@ -67,6 +62,9 @@ add_action('template_redirect', function() {
     die;
 });
 
+/*
+ * CSS additions for cart
+ */
 add_action('wp_head', function() {
 ?>
     <style>
@@ -82,3 +80,46 @@ add_action('wp_head', function() {
     </style>
 <?php
 });
+
+
+/*
+ * saves delivery time at creating order
+ */
+add_action('woocommerce_checkout_create_order', function($order, $data) {
+    if (!array_key_exists('delivery_time', $data))
+        return;
+    $order->update_meta_data('_delivery_time', $data['delivery_time']);
+}, 10, 2);
+
+
+/*
+ * shows delivery time in thank you page
+ */
+add_filter('woocommerce_thankyou', function($order_id) {
+    $order = new WC_Order($order_id);
+    $delivery_time = intval($order->get_meta('_delivery_time', true));
+    if (!$$delivery_time)
+        return;
+    ?>
+    <p>
+        <strong>Gewünschte Lieferzeit</strong><br>
+        <?php echo($delivery_time); ?> - <?php echo($delivery_time + 1); ?> Uhr
+    </p>
+    <?php
+}, 10, 2);
+
+
+/*
+ * shows delivery time in admin backend
+ */
+add_action('woocommerce_admin_order_data_after_shipping_address', function($order) {
+    $delivery_time = intval($order->get_meta('_delivery_time', true));
+    if (!$delivery_time)
+        return;
+    ?>
+    <p>
+        <strong>Gewünschte Lieferzeit</strong><br>
+        <?php echo($delivery_time); ?> - <?php echo($delivery_time + 1); ?> Uhr
+    </p>
+    <?php
+}, 10, 1);

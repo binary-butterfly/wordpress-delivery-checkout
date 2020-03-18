@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') or die('No script kiddies please!');
+
 class DeliveryCheckoutOptions {
     private $options;
 

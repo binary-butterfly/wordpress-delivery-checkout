@@ -8,6 +8,7 @@ Author: binary butterfly GmbH
 Author URI: https://binary-butterfly.de
 Text Domain: delivery-checkout
 Domain Path: /languages
+License: GPLv2 or later
 */
 
 defined('ABSPATH') or die('No script kiddies please!');
