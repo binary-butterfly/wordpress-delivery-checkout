@@ -38,3 +38,47 @@ function generate_delivery_times($params) {
     }
     return $times;
 }
+
+/*
+ * Hinzufügen zur Thank You Page
+ */
+add_filter('woocommerce_thankyou', function($order_id) {
+    $order = new WC_Order($order_id);
+    $delivery_time = intval($order->get_meta('billing_delivery_time', true));
+    ?>
+    <p>
+        <strong>Gewünschte Lieferzeit</strong><br>
+        <?php echo($delivery_time); ?> - <?php echo($delivery_time + 1); ?> Uhr
+    </p>
+    <?php
+}, 10, 2);
+
+
+add_action('template_redirect', function() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET')
+        return;
+    if (!is_checkout())
+        return;
+    if (WC()->customer->get_shipping_postcode())
+        return;
+    WC()->session->set('show-postcode-error', true);
+    wc_add_notice( 'Bitte wählen Sie zunächst den Versand aus.', 'error' );
+    wp_redirect( wc_get_cart_url() );
+    die;
+});
+
+add_action('wp_head', function() {
+?>
+    <style>
+        #calc_shipping_city_field, #calc_shipping_country_field {
+            display: none !important;
+        }
+        .shipping-calculator-form {
+            display: block !important;
+        }
+        #calc_shipping_postcode_field:before {
+            content: "Postleitzahl:";
+        }
+    </style>
+<?php
+});
