@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: Delivery Checkout
-Plugin URI: https://binary-butterfly.de
+Plugin Name: Delivery Checkout for WooCommerce
+Plugin URI: https://github.com/binary-butterfly/wordpress-delivery-checkout
 Description: Fügt ein Feld in das Checkout hinzu, wo die Lieferzeit grob angegeben werden kann.
-Version: 0.1.0
+Version: 0.1.1
 WC requires at least: 3.0.0
-WC tested up to: 3.9.1
+WC tested up to: 4.0.1
 Author: binary butterfly GmbH
 Author URI: https://binary-butterfly.de
 Text Domain: delivery-checkout

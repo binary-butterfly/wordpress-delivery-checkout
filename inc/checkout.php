@@ -11,9 +11,12 @@ add_filter('woocommerce_checkout_fields', function($fields) {
         return $fields;
     }
     if (!array_key_exists('start', $params) || !array_key_exists('end', $params) || !array_key_exists('delay', $params)) {
-        return array();
+        return $fields;
     }
-
+    // we don't need a delivery time when there's nothing to ship
+    if (!WC()->cart->needs_shipping()) {
+        return $fields;
+    }
     $order_array = array(
         'delivery_time' => array(
             'type' => 'select',
@@ -55,6 +58,8 @@ add_action('template_redirect', function() {
     if (!is_checkout())
         return;
     if (WC()->customer->get_shipping_postcode())
+        return;
+    if (!WC()->cart->needs_shipping())
         return;
     WC()->session->set('show-postcode-error', true);
     wc_add_notice( 'Bitte wählen Sie zunächst den Versand aus.', 'error' );
@@ -98,7 +103,7 @@ add_action('woocommerce_checkout_create_order', function($order, $data) {
 add_filter('woocommerce_thankyou', function($order_id) {
     $order = new WC_Order($order_id);
     $delivery_time = intval($order->get_meta('_delivery_time', true));
-    if (!$$delivery_time)
+    if (!$delivery_time)
         return;
     ?>
     <p>
