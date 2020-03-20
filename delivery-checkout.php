@@ -3,7 +3,7 @@
 Plugin Name: Delivery Checkout for WooCommerce
 Plugin URI: https://github.com/binary-butterfly/wordpress-delivery-checkout
 Description: Fügt ein Feld in das Checkout hinzu, wo die Lieferzeit grob angegeben werden kann.
-Version: 0.1.1
+Version: 0.1.2
 WC requires at least: 3.0.0
 WC tested up to: 4.0.1
 Author: binary butterfly GmbH
